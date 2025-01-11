@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .dashboard {
+      text-align: center;
+      margin: 20px auto;
+    }
+    h1 {
+      color: #333;
+    }
+    .buttons-container {
+      margin: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #007BFF;
+      color: white;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .form-container {
+      margin: 20px auto;
+      max-width: 600px;
+      display: none; 
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    button[type="submit"] {
+      background-color: #28a745;
+    }
+    button[type="submit"]:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <h1>Admin Dashboard</h1>
+    <div class="buttons-container">
+      <button onclick="showForm('addCourseForm')">Add Course</button>
+      <button onclick="showForm('addInstructorForm')">Add Instructor</button>
+      <button onclick="showForm('assignLectureForm')">Assign Lecture</button>
+    </div>
+
+   
+    <div id="addCourseForm" class="form-container">
+      <h2>Add Course</h2>
+      <form id="addCourse">
+        <div class="form-group">
+          <label for="courseName">Course Name</label>
+          <input type="text" id="courseName" required>
+        </div>
+        <div class="form-group">
+          <label for="courseLevel">Course Level</label>
+          <input type="text" id="courseLevel" required>
+        </div>
+        <div class="form-group">
+          <label for="courseDescription">Description</label>
+          <textarea id="courseDescription"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="courseImage">Image URL</label>
+          <input type="url" id="courseImage">
+        </div>
+        <button type="submit">Add Course</button>
+      </form>
+    </div>
+
+ 
+    <div id="addInstructorForm" class="form-container">
+      <h2>Add Instructor</h2>
+      <form id="addInstructor">
+        <div class="form-group">
+          <label for="instructorName">Instructor Name</label>
+          <input type="text" id="instructorName" required>
+        </div>
+        <div class="form-group">
+          <label for="instructorEmail">Email</label>
+          <input type="email" id="instructorEmail" required>
+        </div>
+        <button type="submit">Add Instructor</button>
+      </form>
+    </div>
+
+    
+    
+    <div id="assignLectureForm" class="form-container">
+      <h2>Assign Lecture</h2>
+      <form id="assignLecture">
+        <div class="form-group">
+          <label for="courseId">Select Course</label>
+          <select id="courseId" required>
+            <option value="" disabled selected>-- Select Course --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="instructorId">Select Instructor</label>
+          <select id="instructorId" required>
+            <option value="" disabled selected>-- Select Instructor --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="lectureDate">Lecture Date</label>
+          <input type="date" id="lectureDate" required>
+        </div>
+        <button type="submit">Assign Lecture</button>
+      </form>
+    </div>
+    
+  
+  </div>
+
+  <script>
+    
+    function showForm(formId) {
+      document.querySelectorAll('.form-container').forEach(form => form.style.display = 'none');
+      document.getElementById(formId).style.display = 'block';
+    }
+
+    document.getElementById('addCourse').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in as admin!');
+        return;
+      }
+
+      const name = document.getElementById('courseName').value;
+      const level = document.getElementById('courseLevel').value;
+      const description = document.getElementById('courseDescription').value;
+      const image = document.getElementById('courseImage').value;
+
+      try {
+        const response = await fetch('http://localhost:5000/api/admin/add-course', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name, level, description, image }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.message || 'Failed to add course');
+        }
+
+        alert('Course added successfully!');
+        document.getElementById('addCourse').reset();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+   
+    document.getElementById('addInstructor').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const token = localStorage.getItem('token');
+      const name = document.getElementById('instructorName').value;
+      const email = document.getElementById('instructorEmail').value;
+
+      try {
+        const response = await fetch('http://localhost:5000/api/admin/add-instructor', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name, email }),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.message || 'Failed to add instructor');
+        }
+
+        alert('Instructor added successfully!');
+        document.getElementById('addInstructor').reset();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', async () => {
+  const courseSelect = document.getElementById('courseId');
+  const instructorSelect = document.getElementById('instructorId');
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Please log in as admin!');
+    return;
+  }
+
+
+  try {
+    const courseResponse = await fetch('http://localhost:5000/api/admin/courses', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const courseData = await courseResponse.json();
+
+    if (courseResponse.ok) {
+      courseData.courses.forEach(course => {
+        const option = document.createElement('option');
+        option.value = course._id; 
+        option.textContent = course.name; 
+        courseSelect.appendChild(option);
+      });
+    } else {
+      throw new Error(courseData.message || 'Failed to fetch courses');
+    }
+  } catch (err) {
+    alert(`Error fetching courses: ${err.message}`);
+  }
+
+  
+  try {
+    const instructorResponse = await fetch('http://localhost:5000/api/admin/instructors', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const instructorData = await instructorResponse.json();
+
+    if (instructorResponse.ok) {
+      instructorData.instructors.forEach(instructor => {
+        const option = document.createElement('option');
+        option.value = instructor._id; 
+        option.textContent = `${instructor.name} (${instructor.email})`; 
+        instructorSelect.appendChild(option);
+      });
+    } else {
+      throw new Error(instructorData.message || 'Failed to fetch instructors');
+    }
+  } catch (err) {
+    alert(`Error fetching instructors: ${err.message}`);
+  }
+});
+
+
+document.getElementById('assignLecture').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Please log in as admin!');
+    return;
+  }
+
+  const courseId = document.getElementById('courseId').value;
+  const instructorId = document.getElementById('instructorId').value;
+  const date = document.getElementById('lectureDate').value;
+
+  try {
+    const response = await fetch('http://localhost:5000/api/admin/assign-lecture', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ courseId, instructorId, date }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert('Lecture assigned successfully!');
+      document.getElementById('assignLecture').reset();
+    } else {
+      throw new Error(data.message || 'Failed to assign lecture');
+    }
+  } catch (err) {
+    alert(`Error: ${err.message}`);
+  }
+});
+
+  </script>
+</body>
+</html>

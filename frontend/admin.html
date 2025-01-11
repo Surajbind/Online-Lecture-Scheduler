@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+    <button id="logout-btn">Logout</button>
+  </header>
+  <div class="container">
+    <section id="instructors-section">
+      <h2>Instructors</h2>
+      <ul id="instructors-list"></ul>
+    </section>
+    <section id="courses-section">
+      <h2>Add Course</h2>
+      <form id="add-course-form">
+        <input type="text" id="course-name" placeholder="Course Name" required>
+        <input type="text" id="course-level" placeholder="Course Level" required>
+        <textarea id="course-description" placeholder="Course Description"></textarea>
+        <input type="date" id="lecture-date" required>
+        <select id="instructor-dropdown">
+          <option value="">Select Instructor</option>
+        </select>
+        <button type="submit">Add Course</button>
+      </form>
+      <p id="course-message"></p>
+    </section>
+  </div>
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecture Scheduling Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .dashboard {
+      text-align: center;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <h1>Admin Dashboard</h1>
+    <button onclick="location.href='login.html'">Admin Login</button>
+    <button onclick="viewAllLectures()">View All Lectures</button>
+  </div>
+
+  <script>
+    
+    function viewAllLectures() {
+      fetch('/allCourses', {
+        method: 'GET',  
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())  
+      .then(data => {
+        if (data.courses && data.courses.length > 0) {
+          
+          let coursesPageContent = '<h1>All Courses</h1><ul>';
+          
+          data.courses.forEach(course => {
+            coursesPageContent += `<li><strong>${course.name}</strong> (Instructor: ${course.instructor}, Date: ${new Date(course.lectures[0].date).toLocaleDateString()})</li>`;
+          });
+          
+          coursesPageContent += '</ul>';
+          
+          
+          document.body.innerHTML = coursesPageContent;
+        } else {
+          alert('No courses found');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching courses:', error);
+        alert('Failed to fetch courses');
+      });
+    }
+  </script>
+</body>
+</html>
